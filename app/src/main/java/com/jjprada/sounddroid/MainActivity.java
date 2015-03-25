@@ -7,9 +7,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.lang.reflect.Type;
+import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -22,10 +26,12 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         Gson gson = new Gson();
-        Track track = gson.fromJson(trackJSON(), Track.class);
-        Log.d(TAG, "ID is: "+track.getID());
-        Log.d(TAG, "Title is: "+track.getTitle());
-        Log.d(TAG, "StreamURL is: "+track.getStreamURL());
+        Type type = new TypeToken<List<Track>>(){}.getType();
+        List<Track> tracks = gson.fromJson(trackJSON(), type);
+
+        Log.d(TAG, "ID is: "+tracks.get(0).getID());
+        Log.d(TAG, "Title is: "+tracks.get(0).getTitle());
+        Log.d(TAG, "StreamURL is: "+tracks.get(0).getStreamURL());
     }
 
     private String trackJSON(){

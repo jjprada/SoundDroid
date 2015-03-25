@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.gson.Gson;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,17 +21,11 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        JSONObject jsonObject = null;
-        try {
-            jsonObject = new JSONObject(trackJSON());
-        }catch (JSONException e){
-            Log.d(TAG,"JSONException is: "+e);
-        }
-        Track track = Track.parse(jsonObject);
-        Log.d(TAG,"This is the title: "+track.getTitle());
-        Log.d(TAG,"This is the id: "+track.getID());
-        Log.d(TAG,"This is the streamURL: "+track.getStreamURL());
-
+        Gson gson = new Gson();
+        Track track = gson.fromJson(trackJSON(), Track.class);
+        Log.d(TAG, "ID is: "+track.getID());
+        Log.d(TAG, "Title is: "+track.getTitle());
+        Log.d(TAG, "StreamURL is: "+track.getStreamURL());
     }
 
     private String trackJSON(){

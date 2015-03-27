@@ -1,4 +1,4 @@
-package com.jjprada.sounddroid;
+package com.jjprada.sounddroid.com.jjprada.soundroid.soundcloud;
 
 import java.util.List;
 

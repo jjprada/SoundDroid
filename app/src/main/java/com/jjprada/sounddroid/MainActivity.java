@@ -2,21 +2,21 @@ package com.jjprada.sounddroid;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.jjprada.sounddroid.com.jjprada.soundroid.soundcloud.SoundCloud;
+import com.jjprada.sounddroid.com.jjprada.soundroid.soundcloud.SoundCloudService;
+import com.jjprada.sounddroid.com.jjprada.soundroid.soundcloud.Track;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit.Callback;
-import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
@@ -25,20 +25,27 @@ public class MainActivity extends ActionBarActivity {
 
     private static final String TAG = "MainActivity";
 
+    private TracksAdapter mAdapter;
+    private List<Track> mTracks;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        RestAdapter restAdapter = new RestAdapter.Builder()
-                .setLogLevel(RestAdapter.LogLevel.FULL)
-                .setEndpoint("http://api.soundcloud.com")
-                .build();
-        SoundCloudService service = restAdapter.create(SoundCloudService.class);
+        RecyclerView recyclerView = (RecyclerView)findViewById(R.id.sound_list);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mTracks = new ArrayList<Track>();
+        mAdapter = new TracksAdapter(mTracks);
+        recyclerView.setAdapter(mAdapter);
+
+        SoundCloudService service = SoundCloud.getService();
         service.searchSongs("dark horse", new Callback<List<Track>>() {
             @Override
             public void success(List<Track> tracks, Response response) {
-                Log.d(TAG, "Track title is "+tracks.get(0).getTitle());
+                mTracks.clear();
+                mTracks.addAll(tracks);
+                mAdapter.notifyDataSetChanged();
             }
 
             @Override

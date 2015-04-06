@@ -2,4 +2,13 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="vertical_small_margin">16dp</dimen>
+    <dimen name="vertical_large_margin">72dp</dimen>
+    <dimen name="vertical_inner_margin">56dp</dimen>        // Si ya tenemos un padding de 16 en un elemento superior, al child le aplicamos este (16+56 = 72)
+
+    <dimen name="avatar_size">48dp</dimen>
+    <dimen name="avatar_padding">4dp</dimen>
+
+    <dimen name="row_height">72dp</dimen>
 </resources>

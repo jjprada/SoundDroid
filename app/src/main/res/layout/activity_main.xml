@@ -24,7 +24,7 @@
                 android:layout_height="@dimen/avatar_size"/>
             <TextView
                 android:text="Hello World!!!"
-
+                android:textColor="@android:color/white"
                 android:paddingLeft="@dimen/vertical_super_small_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>

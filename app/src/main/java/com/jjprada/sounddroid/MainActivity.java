@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.support.v7.widget.Toolbar;
 
 import com.jjprada.sounddroid.com.jjprada.soundroid.soundcloud.SoundCloud;
 import com.jjprada.sounddroid.com.jjprada.soundroid.soundcloud.SoundCloudService;
@@ -15,6 +16,7 @@ import com.jjprada.sounddroid.com.jjprada.soundroid.soundcloud.Track;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TooManyListenersException;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -33,10 +35,12 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Toolbar playerToolbar = (Toolbar)findViewById(R.id.player_toolbar);
+
         RecyclerView recyclerView = (RecyclerView)findViewById(R.id.sound_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         mTracks = new ArrayList<Track>();
-        mAdapter = new TracksAdapter(mTracks);
+        mAdapter = new TracksAdapter(this, mTracks);
         recyclerView.setAdapter(mAdapter);
 
         SoundCloudService service = SoundCloud.getService();

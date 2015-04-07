@@ -1,5 +1,6 @@
 package com.jjprada.sounddroid;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jjprada.sounddroid.com.jjprada.soundroid.soundcloud.Track;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -28,8 +30,10 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder
     }
 
     private List<Track> mTracks;
+    private Context mContext;
 
-    TracksAdapter (List<Track> tracks){     // Constructor de "TracksAdapter"
+    TracksAdapter (Context context, List<Track> tracks){     // Constructor de "TracksAdapter"
+        mContext = context;
         mTracks = tracks;
     }
 
@@ -49,7 +53,8 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder
     public void onBindViewHolder(ViewHolder holder, int position) {
         Track track = mTracks.get(position);
         holder.titleTextView.setText(track.getTitle());
-        holder.thumbImageView.setImageResource();
+
+        Picasso.with(mContext).load(track.getAvatarURL()).into(holder.thumbImageView);
     }
 
 

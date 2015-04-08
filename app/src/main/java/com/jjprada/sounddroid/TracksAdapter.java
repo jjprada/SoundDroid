@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder> {
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private final TextView titleTextView;
         private final ImageView thumbImageView;
 
@@ -27,13 +27,19 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder
             super(v);
             titleTextView = (TextView)v.findViewById(R.id.track_title);         // Usamos esto solo una vez, porque consume mucho tiempo
             thumbImageView = (ImageView)v.findViewById(R.id.track_thumbnail);
-
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    if (mOnItemClickListener != null){
+                        mOnItemClickListener.onItemClick(null, v, getPosition(), 0);
+                    }
                 }
             });
+        }
+
+        @Override
+        public void onClick(View v) {
+
         }
     }
 
@@ -66,9 +72,6 @@ public class TracksAdapter extends RecyclerView.Adapter<TracksAdapter.ViewHolder
     public void onBindViewHolder(ViewHolder holder, int position) {
         Track track = mTracks.get(position);
         holder.titleTextView.setText(track.getTitle());
-
         Picasso.with(mContext).load(track.getAvatarURL()).into(holder.thumbImageView);
     }
-
-
 }

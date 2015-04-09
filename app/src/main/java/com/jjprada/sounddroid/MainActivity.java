@@ -39,6 +39,7 @@ public class MainActivity extends ActionBarActivity {
     private List<Track> mTracks;
     private ImageView mPlayerThumbnail;
     private TextView mPlayerTitle;
+    private ImageView mPlayerToggleButton;
     private MediaPlayer mMediaPlayer;
 
     @Override
@@ -46,12 +47,31 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Toolbar playerToolbar = (Toolbar)findViewById(R.id.player_toolbar);
+        mPlayerThumbnail = (ImageView)findViewById(R.id.player_thumbnail_track);
+        mPlayerTitle = (TextView)findViewById(R.id.player_title_track);
+        mPlayerToggleButton = (ImageView)findViewById(R.id.player_toggle_button);
+        mPlayerToggleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleSongState();
+            }
+        });
+
         mMediaPlayer = new MediaPlayer();
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
-        Toolbar playerToolbar = (Toolbar)findViewById(R.id.player_toolbar);
-        mPlayerThumbnail = (ImageView)findViewById(R.id.player_thumnail_track);
-        mPlayerTitle = (TextView)findViewById(R.id.player_title_track);
+        mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                toggleSongState();
+            }
+        });
+        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mPlayerToggleButton.setImageResource(R.drawable.ic_play);
+            }
+        });
 
         RecyclerView recyclerView = (RecyclerView)findViewById(R.id.sound_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -65,8 +85,13 @@ public class MainActivity extends ActionBarActivity {
                 Picasso.with(MainActivity.this).load(selectedTrack.getAvatarURL()).into(mPlayerThumbnail);
                 mPlayerTitle.setText(selectedTrack.getTitle());
 
+                if (mMediaPlayer.isPlaying()){
+                    mMediaPlayer.stop();
+                    mMediaPlayer.reset();
+                }
+
                 try {
-                    mMediaPlayer.setDataSource(selectedTrack.getStreamURL());
+                    mMediaPlayer.setDataSource(selectedTrack.getStreamURL() + "?client_id=" + SoundCloudService.CLIENT_ID);
                     mMediaPlayer.prepareAsync();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -89,6 +114,29 @@ public class MainActivity extends ActionBarActivity {
 
             }
         });
+    }
+
+    private void toggleSongState() {
+        if (mMediaPlayer.isPlaying()) {
+            mMediaPlayer.pause();
+            mPlayerToggleButton.setImageResource(R.drawable.ic_play);
+        } else {
+            mMediaPlayer.start();
+            mPlayerToggleButton.setImageResource(R.drawable.ic_pause);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (mMediaPlayer != null){
+            if (mMediaPlayer.isPlaying()){
+                mMediaPlayer.stop();
+            }
+            mMediaPlayer.release();
+            mMediaPlayer = null;
+        }
     }
 
     @Override

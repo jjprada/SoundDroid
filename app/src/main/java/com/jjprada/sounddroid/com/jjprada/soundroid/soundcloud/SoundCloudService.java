@@ -1,5 +1,7 @@
 package com.jjprada.sounddroid.com.jjprada.soundroid.soundcloud;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import retrofit.Callback;
@@ -15,4 +17,7 @@ public interface SoundCloudService {
 
     @GET("/tracks?client_id="+CLIENT_ID)
     public void searchSongs(@Query("q") String query, Callback<List<Track>> cb);
+
+    @GET("/tracks?client_id="+CLIENT_ID)
+    public void getRecentSongs(@Query("created_at[from]") String query, Callback<List<Track>> cb);
 }

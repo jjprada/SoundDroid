@@ -2,18 +2,18 @@ package com.jjprada.sounddroid;
 
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.support.v7.widget.Toolbar;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.jjprada.sounddroid.com.jjprada.soundroid.soundcloud.SoundCloud;
@@ -22,16 +22,17 @@ import com.jjprada.sounddroid.com.jjprada.soundroid.soundcloud.Track;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.TooManyListenersException;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements SearchView.OnQueryTextListener {
 
     private static final String TAG = "MainActivity";
 
@@ -41,6 +42,9 @@ public class MainActivity extends ActionBarActivity {
     private TextView mPlayerTitle;
     private ImageView mPlayerToggleButton;
     private MediaPlayer mMediaPlayer;
+    private SoundCloudService mService;
+    private SearchView mSearchView;
+    private String mCheck = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,8 +104,17 @@ public class MainActivity extends ActionBarActivity {
         });
         recyclerView.setAdapter(mAdapter);
 
-        SoundCloudService service = SoundCloud.getService();
-        service.searchSongs("dark horse", new Callback<List<Track>>() {
+        mService = SoundCloud.getService();
+        updateTracks();
+    }
+
+    private void updateTracks() {
+        String date = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date());
+        mService.getRecentSongs(date, getCallback());
+    }
+
+    private Callback<List<Track>> getCallback() {
+        return new Callback<List<Track>>() {
             @Override
             public void success(List<Track> tracks, Response response) {
                 mTracks.clear();
@@ -110,10 +123,8 @@ public class MainActivity extends ActionBarActivity {
             }
 
             @Override
-            public void failure(RetrofitError error) {
-
-            }
-        });
+            public void failure(RetrofitError error) { }
+        };
     }
 
     private void toggleSongState() {
@@ -143,6 +154,21 @@ public class MainActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        mSearchView = (SearchView)menu.findItem(R.id.actions_search).getActionView();
+        mSearchView.setOnQueryTextListener(this);
+        MenuItemCompat.setOnActionExpandListener(menu.findItem(R.id.actions_search), new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                updateTracks();
+                return true;
+            }
+        });
         return true;
     }
 
@@ -154,10 +180,26 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.actions_search) {
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        if (!mCheck.equals(query)){     // Comprueba que la busqueda no sea igual a la última busqueda hecha
+            mService.searchSongs(query, getCallback());
+            mCheck = query;
+        }
+        mSearchView.clearFocus();
+
+        return true;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        return false;
     }
 }
